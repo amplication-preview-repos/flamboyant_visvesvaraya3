@@ -1,0 +1,68 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Administrator {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  name          String?
+  email         String?
+  verifications Verification[]
+  tasks         Task[]
+}
+
+model Verification {
+  id              String         @id @default(cuid())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  feedback        String?
+  approved        Boolean?
+  agent           Agent?         @relation(fields: [agentId], references: [id])
+  agentId         String?
+  administrator   Administrator? @relation(fields: [administratorId], references: [id])
+  administratorId String?
+}
+
+model Agent {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  name          String?
+  email         String?
+  verifications Verification[]
+  tasks         Task[]
+}
+
+model Task {
+  id              String          @id @default(cuid())
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  title           String?
+  description     String?
+  status          EnumTaskStatus?
+  checklists      Checklist[]
+  agent           Agent?          @relation(fields: [agentId], references: [id])
+  agentId         String?
+  administrator   Administrator?  @relation(fields: [administratorId], references: [id])
+  administratorId String?
+}
+
+model Checklist {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  taskItem  String?
+  completed Boolean?
+  task      Task?    @relation(fields: [taskId], references: [id])
+  taskId    String?
+}
+
+enum EnumTaskStatus {
+  Option1
+}
